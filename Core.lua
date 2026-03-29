@@ -19,7 +19,7 @@ ns.VERSION = "1.0.0"
 ns.lockedItems  = {}    -- { [itemGUID] = true }
 ns.lockMode = false -- true när lås-läge är aktivt
 ns.merchantOpen = false -- true när handlare är öppen
-ns:SetLockModeOverlay(ns.lockMode) -- UI.lua kommer att använda denna variabel för att visa en overlay när lås-läge är aktivt
+
 
 
 -- ============================================================
@@ -157,8 +157,9 @@ SlashCmdList["REDLOC"] = function(msg)
     -- Rensa inmatning
     local cmd = (msg or ""):lower():match("^%s*(.-)%s*$")
 
-if cmd == "" then
+if cmd == "lock" then
     ns.lockMode = not ns.lockMode
+    ns:SetLockModeOverlay(ns.lockMode) -- UI.lua kommer att använda denna variabel för att visa en overlay när lås-läge är aktivt
     if ns.lockMode then
         print("|cFFFF4444[RedLoc]|r Lås-läge |cFF00FF00aktiverat|r – klicka på items för att låsa.")
     else
