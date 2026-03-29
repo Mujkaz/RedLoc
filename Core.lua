@@ -17,7 +17,9 @@ ns.VERSION = "1.0.0"
 -- ============================================================
 
 ns.lockedItems  = {}    -- { [itemGUID] = true }
+ns.lockMode = false -- true när lås-läge är aktivt
 ns.merchantOpen = false -- true när handlare är öppen
+ns:SetLockModeOverlay(ns.lockMode) -- UI.lua kommer att använda denna variabel för att visa en overlay när lås-läge är aktivt
 
 
 -- ============================================================
@@ -155,28 +157,36 @@ SlashCmdList["REDLOC"] = function(msg)
     -- Rensa inmatning
     local cmd = (msg or ""):lower():match("^%s*(.-)%s*$")
 
-    if cmd == "help" or cmd == "" then
-        print("|cFFFF4444[RedLoc]|r v" .. ns.VERSION .. " – Kommandon:")
-        print("  |cFFFFFF00/redloc help|r  – Visa denna hjälp")
-        print("  |cFFFFFF00/redloc list|r  – Lista antal låsta items")
-        print("  |cFFFFFF00/redloc clear|r – Lås upp alla items")
-        print("  |cFFFFFF00Högerklicka|r på ett item i väskan för att låsa/låsa upp.")
-
-    elseif cmd == "list" then
-        local count = 0
-        for _ in pairs(ns.lockedItems) do count = count + 1 end
-        if count == 0 then
-            print("|cFFFF4444[RedLoc]|r Inga låsta items.")
-        else
-            print("|cFFFF4444[RedLoc]|r " .. count .. " låst(a) item(s) för denna karaktär.")
-        end
-
-    elseif cmd == "clear" then
-        wipe(ns.lockedItems)
-        print("|cFFFF4444[RedLoc]|r Alla items upplåsta.")
-        ns:RefreshAllBags()
-
+if cmd == "" then
+    ns.lockMode = not ns.lockMode
+    if ns.lockMode then
+        print("|cFFFF4444[RedLoc]|r Lås-läge |cFF00FF00aktiverat|r – klicka på items för att låsa.")
     else
-        print("|cFFFF4444[RedLoc]|r Okänt kommando '|cFFFFFF00" .. cmd .. "|r'. Skriv /redloc help.")
+        print("|cFFFF4444[RedLoc]|r Lås-läge |cFFFF4444inaktiverat|r.")
     end
+
+elseif cmd == "help" then
+    print("|cFFFF4444[RedLoc]|r v" .. ns.VERSION .. " – Kommandon:")
+    print("  |cFFFFFF00/redloc|r        – Aktivera/inaktivera lås-läge")
+    print("  |cFFFFFF00/redloc help|r   – Visa denna hjälp")
+    print("  |cFFFFFF00/redloc list|r   – Lista antal låsta items")
+    print("  |cFFFFFF00/redloc clear|r  – Lås upp alla items")
+
+elseif cmd == "list" then
+    local count = 0
+    for _ in pairs(ns.lockedItems) do count = count + 1 end
+    if count == 0 then
+        print("|cFFFF4444[RedLoc]|r Inga låsta items.")
+    else
+        print("|cFFFF4444[RedLoc]|r " .. count .. " låst(a) item(s) för denna karaktär.")
+    end
+
+elseif cmd == "clear" then
+    wipe(ns.lockedItems)
+    print("|cFFFF4444[RedLoc]|r Alla items upplåsta.")
+    ns:RefreshAllBags()
+
+else
+    print("|cFFFF4444[RedLoc]|r Okänt kommando. Skriv |cFFFFFF00/redloc help|r.")
+end
 end
